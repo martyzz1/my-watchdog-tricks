@@ -1,0 +1,62 @@
+import queue
+import subprocess
+from threading import Thread
+
+from watchdog.tricks import Trick
+
+from watchdog_tricks import utils
+
+
+class BatchTrick(Trick):
+    """Batching events within a time window and send it as a single event
+    This would be particularly useful for things like restarting a server after code changes.
+    You don't want to restart the server mutliple times when multiple files are modified due to a save command
+    in the text editor or more commonly when the user does a git pull.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.timeout = kwargs.pop("time_interval", 0.2)
+        super(BatchTrick, self).__init__(*args, **kwargs)
+        self.event_queue = queue.Queue()
+        self.timer_thread = Thread(target=self.timer_loop)
+        self.timer_thread.daemon = True
+        self.timer_thread.start()
+
+    @utils.trace_event
+    def on_modified(self, event):
+        self.event_queue.put(event)
+
+    @utils.trace_event
+    def on_deleted(self, event):
+        self.event_queue.put(event)
+
+    @utils.trace_event
+    def on_created(self, event):
+        self.event_queue.put(event)
+
+    @utils.trace_event
+    def on_moved(self, event):
+        self.event_queue.put(event)
+
+    def timer_loop(self):
+        events = []
+        while True:
+            try:
+                event = self.event_queue.get(timeout=self.timeout)
+                events.append(event)
+            except queue.Empty:
+                if events:
+                    self.on_multiple_events(events)
+                    events = []
+
+    def on_multiple_events(self, events):
+        raise NotImplementedError()
+
+
+class ServerRestartTrick(BatchTrick):
+    def __init__(self, restart_command, **kwargs):
+        super(ServerRestartTrick, self).__init__(**kwargs)
+        self.restart_command = restart_command
+
+    def on_multiple_events(self, events):
+        subprocess.call(self.restart_command, shell=True)
