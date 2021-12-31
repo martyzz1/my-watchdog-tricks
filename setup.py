@@ -26,7 +26,6 @@ setuptools.setup(
     ],
     install_requires=[
         "watchdog[watchmedo]==1.0.2",
-        "watchdog_tricks@https://github.com/martyzz1/watchdog-tricks/archive/v1.0.0.zip",
     ],
-    packages=["watchdog_tricks"],
+    packages=[""],
 )
