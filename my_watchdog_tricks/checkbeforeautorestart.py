@@ -6,8 +6,9 @@ from pathlib import Path
 
 # Third party libraries
 from watchdog.utils import echo
-from watchdog_tricks.batch import BatchTrick
-from watchdog_tricks.utils import StreamCaptureCommandOutput
+
+from my_watchdog_tricks.batch import BatchTrick
+from my_watchdog_tricks.utils import StreamCaptureCommandOutput
 
 
 class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):

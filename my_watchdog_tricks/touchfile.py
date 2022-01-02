@@ -3,7 +3,8 @@ from pathlib import Path
 
 # Third party libraries
 from watchdog.utils import echo
-from watchdog_tricks.batch import BatchTrick
+
+from my_watchdog_tricks.batch import BatchTrick
 
 
 class TouchFileTrick(BatchTrick):
