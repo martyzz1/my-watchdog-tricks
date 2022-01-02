@@ -1,9 +1,8 @@
 import os
-from pathlib import Path
-
-import time
 import signal
 import subprocess
+import time
+from pathlib import Path
 
 # Third party libraries
 from watchdog.utils import echo
@@ -22,10 +21,20 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
     the process.
     """
 
-    def __init__(self, command, check_command, patterns=None, ignore_patterns=None,
-                 ignore_directories=False, stop_signal=signal.SIGINT,
-                 kill_after=10, autostart=False, only_these_events=None,
-                 touchfile=None, source_directory=None):
+    def __init__(
+        self,
+        command,
+        check_command,
+        patterns=None,
+        ignore_patterns=None,
+        ignore_directories=False,
+        stop_signal=signal.SIGINT,
+        kill_after=10,
+        autostart=False,
+        only_these_events=None,
+        touchfile=None,
+        source_directory=None,
+    ):
         self.command = command
         self.check_command = check_command
         self.touchfile = touchfile
@@ -35,8 +44,7 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         self.process = None
         if source_directory:
             self.source_directory = source_directory
-        super(CheckBeforeAutoRestartTrick, self).__init__(
-            patterns, ignore_patterns, ignore_directories)
+        super(CheckBeforeAutoRestartTrick, self).__init__(patterns, ignore_patterns, ignore_directories)
         if autostart:
             self.start()
 

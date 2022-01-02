@@ -3,7 +3,6 @@ import subprocess
 from threading import Thread
 
 from watchdog.tricks import Trick
-
 from watchdog_tricks import utils
 
 

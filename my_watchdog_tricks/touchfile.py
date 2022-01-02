@@ -14,15 +14,21 @@ class TouchFileTrick(BatchTrick):
 
     """
 
-    def __init__(self, touchfile, patterns=None, ignore_patterns=None,
-                 ignore_directories=False, stop_signal=signal.SIGINT,
-                 kill_after=10, source_directory=None):
+    def __init__(
+        self,
+        touchfile,
+        patterns=None,
+        ignore_patterns=None,
+        ignore_directories=False,
+        stop_signal=signal.SIGINT,
+        kill_after=10,
+        source_directory=None,
+    ):
         self.touchfile = touchfile
         self.stop_signal = stop_signal
         self.kill_after = kill_after
         self.source_directory = source_directory
-        super(TouchFileTrick, self).__init__(
-            patterns, ignore_patterns, ignore_directories)
+        super(TouchFileTrick, self).__init__(patterns, ignore_patterns, ignore_directories)
 
     def touch_file(self):
         print("Touching - {0}".format(self.touchfile))
