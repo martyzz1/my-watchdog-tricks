@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="my-watchdog-tricks",
-    version="1.0.3",
+    version="1.0.4",
     license="MIT",
     author="Martin Moss",
     author_email="martyzz1@github.com",
@@ -27,5 +27,5 @@ setuptools.setup(
     install_requires=[
         "watchdog[watchmedo]==1.0.2",
     ],
-    packages=[""],
+    packages=["my_watchdog_tricks"],
 )
