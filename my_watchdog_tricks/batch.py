@@ -36,7 +36,8 @@ class BatchTrick(Trick):
 
     @utils.trace_event
     def on_moved(self, event):
-        self.event_queue.put(event)
+        # self.event_queue.put(event)
+        print("ignoring on_moved event")
 
     def timer_loop(self):
         events = []
