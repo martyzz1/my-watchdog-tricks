@@ -8,7 +8,7 @@ from pathlib import Path
 from watchdog.utils import echo
 
 from my_watchdog_tricks.batch import BatchTrick
-from my_watchdog_tricks.utils import StreamCaptureCommandOutput, trace_event
+from my_watchdog_tricks.utils import StreamCaptureCommandOutput
 
 
 class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
@@ -91,7 +91,6 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         self.process = None
 
     @echo.echo
-    @trace_event
     def on_multiple_events(self, events):
         go = False
         if self.only_these_events:
@@ -106,4 +105,5 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
             self.stop()
             self.start()
         else:
+            print("No valid events were received")
             pass
