@@ -35,6 +35,7 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         only_these_events=None,
         touchfile=None,
         source_directory=None,
+        **kwargs,
     ):
         self.command = command
         self.check_command = check_command
@@ -45,7 +46,7 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         self.process = None
         if source_directory:
             self.source_directory = source_directory
-        super(CheckBeforeAutoRestartTrick, self).__init__(patterns, ignore_patterns, ignore_directories)
+        super(CheckBeforeAutoRestartTrick, self).__init__(patterns, ignore_patterns, ignore_directories, **kwargs)
         if autostart:
             self.start()
 
