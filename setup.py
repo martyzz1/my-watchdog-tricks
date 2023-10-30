@@ -25,7 +25,7 @@ setuptools.setup(
         "Topic :: System :: Filesystems",
     ],
     install_requires=[
-        "watchdog[watchmedo]==1.0.2",
+        "watchdog[watchmedo]==3.0.0",
     ],
     packages=["my_watchdog_tricks"],
 )
