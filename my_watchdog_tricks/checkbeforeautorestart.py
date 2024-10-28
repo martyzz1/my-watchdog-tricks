@@ -116,6 +116,7 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
 
         # Deduplicate files list
         files = list(set(files))
+        print("CHECK WATCHDOG FILES", files)
 
         # Proceed if there are valid events and check is successful
         if files and self.check(events):
