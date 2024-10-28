@@ -12,7 +12,6 @@ from my_watchdog_tricks.utils import StreamCaptureCommandOutput
 
 
 class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
-
     """Starts a long-running subprocess and restarts it on matched events.
 
     The command parameter is a list of command arguments, such as
@@ -35,6 +34,7 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         only_these_events=None,
         touchfile=None,
         source_directory=None,
+        files_option=None,  # Optional config for --files option
         **kwargs,
     ):
         self.command = command
@@ -43,12 +43,15 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         self.only_these_events = only_these_events
         self.stop_signal = stop_signal
         self.kill_after = kill_after
+        self.files_option = files_option  # Store the files option config
         self.process = None
         if source_directory:
             self.source_directory = source_directory
-        super(CheckBeforeAutoRestartTrick, self).__init__(patterns, ignore_patterns, ignore_directories, **kwargs)
+        super(CheckBeforeAutoRestartTrick, self).__init__(
+            patterns, ignore_patterns, ignore_directories, **kwargs
+        )
         if autostart:
-            self.start()
+            self.start([])  # Start without specific files if autostart
 
     def check(self, events):
         # print("[{1}] Calling check command - {0}".format(self.check_command, self.command))
@@ -58,16 +61,25 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         # print("[{1}] Touching - {0}".format(self.touchfile, self.command))
         Path(self.touchfile).touch(exist_ok=True)
 
-    def start(self):
+    def start(self, files):
+        # Append --files argument to self.command if files_option is provided and files are specified
+        if self.files_option and files:
+            files_argument = self.files_option + " " + " ".join(files)
+            self.command.append(files_argument)
+
         if self.touchfile:
-            print("[WATCHMEDO] starting command - {0} with touchfile {1}".format(self.command, self.touchfile))
+            print(
+                "[WATCHMEDO] starting command - {0} with touchfile {1}".format(
+                    self.command, self.touchfile
+                )
+            )
             if self.streamcapture(self.command):
                 self.touch_file()
         else:
             print("[WATCHMEDO] starting command - {0}".format(self.command))
             self.process = subprocess.Popen(self.command, preexec_fn=os.setsid)
 
-    def stop(self):
+    def stop(self, files):
         if self.process is None:
             # print("[{0}] Process is None returning instantly".format(self.command))
             return
@@ -93,18 +105,22 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
 
     @echo.echo
     def on_multiple_events(self, events):
-        go = False
+        # Filter and collect src_path values based on event type
         if self.only_these_events:
-            for event in events:
-                if event.event_type in self.only_these_events:
-                    go = True
-                    break
+            files = [
+                event.src_path
+                for event in events
+                if event.event_type in self.only_these_events
+            ]
         else:
-            go = True
+            files = [event.src_path for event in events]
 
-        if go and self.check(events):
-            self.stop()
-            self.start()
+        # Deduplicate files list
+        files = list(set(files))
+
+        # Proceed if there are valid events and check is successful
+        if files and self.check(events):
+            self.stop(files)
+            self.start(files)
         else:
             print("No valid events were received")
-            pass
