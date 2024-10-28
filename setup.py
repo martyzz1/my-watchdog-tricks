@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="my-watchdog-tricks",
-    version="2.1.2",
+    version="2.1.3",
     license="MIT",
     author="Martin Moss",
     author_email="martyzz1@github.com",
