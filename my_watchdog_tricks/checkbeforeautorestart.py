@@ -64,7 +64,7 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
     def start(self, files):
         # Append --files argument to self.command if files_option is provided and files are specified
         if self.files_option and files:
-            files_argument = self.files_option + " " + " ".join(files)
+            files_argument = self.files_option + " ".join(files)
             self.command.append(files_argument)
 
         if self.touchfile:
