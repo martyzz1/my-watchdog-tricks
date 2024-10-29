@@ -62,21 +62,24 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
         Path(self.touchfile).touch(exist_ok=True)
 
     def start(self, files):
-        # Append --files argument to self.command if files_option is provided and files are specified
+        # Create a new command instance based on self.command
+        command_to_run = list(self.command)  # Copy self.command to avoid modifying it
+
+        # Append --files argument to command_to_run if files_option is provided and files are specified
         if self.files_option and files:
-            self.command.extend([self.files_option] + files)
+            command_to_run.extend([self.files_option] + files)
 
         if self.touchfile:
             print(
                 "[WATCHMEDO] starting command - {0} with touchfile {1}".format(
-                    self.command, self.touchfile
+                    command_to_run, self.touchfile
                 )
             )
-            if self.streamcapture(self.command):
+            if self.streamcapture(command_to_run):
                 self.touch_file()
         else:
-            print("[WATCHMEDO] starting command - {0}".format(self.command))
-            self.process = subprocess.Popen(self.command, preexec_fn=os.setsid)
+            print("[WATCHMEDO] starting command - {0}".format(command_to_run))
+            self.process = subprocess.Popen(command_to_run, preexec_fn=os.setsid)
 
     def stop(self, files):
         if self.process is None:
@@ -115,8 +118,9 @@ class CheckBeforeAutoRestartTrick(BatchTrick, StreamCaptureCommandOutput):
             files = [event.src_path for event in events]
 
         # Deduplicate files list
+        print("CHECK WATCHDOG ORIGINAL FILES", files)
         files = list(set(files))
-        print("CHECK WATCHDOG FILES", files)
+        print("CHECK WATCHDOG FILES", files, self.command)
 
         # Proceed if there are valid events and check is successful
         if files and self.check(events):
